@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Previews - Twiz</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      color: #f0f6fc;
+    }
+
+    .header a {
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .tabs {
+      display: flex;
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      padding: 0 24px;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      color: #8b949e;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+
+    .tab:hover {
+      color: #c9d1d9;
+    }
+
+    .tab.active {
+      color: #f0f6fc;
+      border-bottom-color: #f78166;
+    }
+
+    .tab .day {
+      font-size: 0.75rem;
+      color: #6e7681;
+      margin-left: 6px;
+    }
+
+    .preview-container {
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .email-frame {
+      width: 100%;
+      max-width: 700px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .email-meta {
+      background: #fff3cd;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #856404;
+      border-bottom: 1px solid #ffc107;
+    }
+
+    .email-meta strong {
+      color: #664d03;
+    }
+
+    .email-content {
+      display: none;
+    }
+
+    .email-content.active {
+      display: block;
+    }
+
+    /* Email styles */
+    .email-body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: white;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .email-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 24px;
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .email-inner {
+      padding: 28px;
+    }
+
+    .email-inner p {
+      margin-bottom: 14px;
+    }
+
+    .email-inner h2 {
+      font-size: 1.1rem;
+      margin: 20px 0 12px;
+      color: #1a1a2e;
+    }
+
+    .email-inner ul, .email-inner ol {
+      margin: 14px 0;
+      padding-left: 24px;
+    }
+
+    .email-inner li {
+      margin-bottom: 8px;
+    }
+
+    .email-inner a {
+      color: #6366f1;
+    }
+
+    .email-inner .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 24px 0;
+    }
+
+    .email-inner .ps {
+      font-style: italic;
+      color: #666;
+      margin-top: 16px;
+    }
+
+    .callout {
+      background: #f8f9fa;
+      border-left: 4px solid #6366f1;
+      padding: 14px 18px;
+      margin: 18px 0;
+    }
+
+    .callout .number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #6366f1;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 16px 0;
+    }
+
+    .offer-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .offer-box h3 {
+      margin-bottom: 10px;
+    }
+
+    .offer-box ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .offer-box li {
+      color: white;
+    }
+
+    .cta-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #6366f1;
+      text-align: center;
+      padding: 14px;
+      background: #f0f0ff;
+      border-radius: 8px;
+      margin: 18px 0;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: #f8f9fa;
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-box .number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #6366f1;
+    }
+
+    .stat-box .label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .copy-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .copy-btn:hover {
+      background: #2ea043;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>📧 Email Previews</h1>
+    <a href="index.html">← Back to Dashboard</a>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-email="1">Email 1 <span class="day">Day 0</span></div>
+    <div class="tab" data-email="2">Email 2 <span class="day">Day 2</span></div>
+    <div class="tab" data-email="3">Email 3 <span class="day">Day 4</span></div>
+    <div class="tab" data-email="4">Email 4 <span class="day">Day 7</span></div>
+  </div>
+
+  <div class="preview-container">
+    <div class="email-frame">
+
+      <!-- Email 1 -->
+      <div class="email-content active" id="email-1">
+        <div class="email-meta">
+          <strong>Subject:</strong> Your free guide to getting found by AI (download inside)<br>
+          <strong>Preview:</strong> The playbook for showing up when ChatGPT recommends your competitors
+        </div>
+        <div class="email-body">
+          <div class="email-header">Twiz</div>
+          <div class="email-inner">
+            <p>Hey {{first_name}},</p>
+            <p>Your guide is ready:</p>
+            <p><a href="#" class="cta-button">📥 Download: How to Get Your Brand Recommended by AI</a></p>
+            <p>Here's the quick version:</p>
+            <p>When someone asks ChatGPT for a recommendation in your industry, 3 names come up. If you're not one of them, you don't exist.</p>
+            <h2>Inside this guide:</h2>
+            <ul>
+              <li>Why AI traffic converts at <strong>6x</strong> the rate of traditional search</li>
+              <li>How a mid-size mortgage broker in Orange County beat billion-dollar lenders to the #1 spot</li>
+              <li>The 90-day action plan to get your brand showing up in ChatGPT, Perplexity, and Claude</li>
+            </ul>
+            <p>This isn't theory. It's the exact system we use with clients.</p>
+            <p>Read it. Steal what works.</p>
+            <hr class="divider">
+            <p>Talk soon,</p>
+            <p><strong>Chad Kaleky</strong><br>Twiz</p>
+            <p class="ps">P.S. Over the next few weeks, I'll be sending you quick tips you can actually use — no fluff. If you ever want us to look at your site and show you what's missing, just reply to any email.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email 2 -->
+      <div class="email-content" id="email-2">
+        <div class="email-meta">
+          <strong>Subject:</strong> Do this one thing and watch your traffic climb<br>
+          <strong>Preview:</strong> Takes 10 minutes. Most sites skip it.
+        </div>
+        <div class="email-body">
+          <div class="email-header">Twiz</div>
+          <div class="email-inner">
+            <p>Hey {{first_name}},</p>
+            <p>Quick one today.</p>
+            <p>There's one thing most websites skip that takes 10 minutes and makes a huge difference in how AI systems see you.</p>
+            <p><strong>Schema markup.</strong></p>
+            <p>It's structured data that tells Google, ChatGPT, and Perplexity exactly what your business is, what you do, and why you're credible.</p>
+            <p>Without it, AI has to guess. And it usually guesses wrong — or skips you entirely.</p>
+            <h2>Here's the 10-minute fix:</h2>
+            <ol>
+              <li>Go to <a href="https://technicalseo.com/tools/schema-markup-generator/">Schema Markup Generator</a></li>
+              <li>Select "Local Business" (or your business type)</li>
+              <li>Fill in your business name, address, phone, hours</li>
+              <li>Copy the JSON-LD output</li>
+              <li>Paste it in your website's &lt;head&gt; section</li>
+            </ol>
+            <p>That's it. You just made your business machine-readable.</p>
+            <div class="callout">
+              <div class="number">3.2x</div>
+              <div>Businesses with schema markup are 3.2x more likely to be included in AI recommendations.</div>
+            </div>
+            <p>This isn't theory — it's the foundation of everything in the guide I sent you.</p>
+            <p>Do this today. It compounds over time.</p>
+            <hr class="divider">
+            <p>Talk soon,</p>
+            <p><strong>Chad Kaleky</strong><br>Twiz</p>
+            <p class="ps">P.S. Already have schema? Reply and tell me — I'll give you the next quick win.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email 3 -->
+      <div class="email-content" id="email-3">
+        <div class="email-meta">
+          <strong>Subject:</strong> Your competitors are showing up in ChatGPT. Are you?<br>
+          <strong>Preview:</strong> This is the shift nobody's talking about.
+        </div>
+        <div class="email-body">
+          <div class="email-header">Twiz</div>
+          <div class="email-inner">
+            <p>Hey {{first_name}},</p>
+            <p>Here's something wild:</p>
+            <p><strong>60% of Google searches now end without a click.</strong></p>
+            <p>People ask. AI answers. They move on.</p>
+            <p>And it's not just Google anymore. Your customers are asking ChatGPT, Perplexity, and Claude for recommendations. Right now.</p>
+            <p>When someone types "best [your service] in [your city]" — do you show up?</p>
+            <p>Or does your competitor?</p>
+            <h2>The numbers are stark:</h2>
+            <div class="stat-row">
+              <div class="stat-box">
+                <div class="number">15.9%</div>
+                <div class="label">ChatGPT referral conversion</div>
+              </div>
+              <div class="stat-box">
+                <div class="number">1.76%</div>
+                <div class="label">Traditional organic conversion</div>
+              </div>
+            </div>
+            <p>That's not a typo. Traffic from AI recommendations converts at <strong>6x the rate</strong> of traditional search.</p>
+            <p>Why? Because when AI recommends you, it comes with built-in trust. You're not one of ten blue links. You're <em>the</em> answer.</p>
+            <h2>The question isn't if this shift is happening.</h2>
+            <p>It's whether you'll be visible when it does.</p>
+            <p>The playbook I sent you breaks down exactly how to get there. If you haven't read it yet — now's the time.</p>
+            <hr class="divider">
+            <p>Talk soon,</p>
+            <p><strong>Chad Kaleky</strong><br>Twiz</p>
+            <p class="ps">P.S. Try it yourself. Ask ChatGPT "Who's the best [your industry] in [your city]?" and see what comes up. Eye-opening.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email 4 -->
+      <div class="email-content" id="email-4">
+        <div class="email-meta">
+          <strong>Subject:</strong> I'll audit your site for free — just reply<br>
+          <strong>Preview:</strong> No call needed. Just your URL.
+        </div>
+        <div class="email-body">
+          <div class="email-header">Twiz</div>
+          <div class="email-inner">
+            <p>Hey {{first_name}},</p>
+            <p>I've been sending you tips on AI visibility.</p>
+            <p>But here's the thing — every business is different. What works for a mortgage broker won't work exactly the same for a SaaS company or a local restaurant.</p>
+            <p>So I want to offer you something:</p>
+            <div class="offer-box">
+              <h3>🎁 Free Personalized AI Visibility Analysis</h3>
+              <p>Reply to this email with your website URL, and I'll personally review:</p>
+              <ul>
+                <li>Whether you're showing up in AI recommendations</li>
+                <li>What's missing from your current setup</li>
+                <li>3 specific things you can fix this week</li>
+              </ul>
+            </div>
+            <p>No sales call. No pitch deck. Just actionable feedback you can use.</p>
+            <p>Why am I doing this? Because most people read a guide and do nothing. I'd rather help a few people actually implement this stuff and see results.</p>
+            <div class="cta-text">Just reply with your URL. That's it.</div>
+            <p>I'll get back to you within 48 hours with your analysis.</p>
+            <hr class="divider">
+            <p>Talk soon,</p>
+            <p><strong>Chad Kaleky</strong><br>Twiz</p>
+            <p class="ps">P.S. If you'd rather hop on a quick call instead, you can book one here: <a href="https://calendly.com/twiz/report">calendly.com/twiz/report</a></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.email-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const emailNum = tab.dataset.email;
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        contents.forEach(c => c.classList.remove('active'));
+        document.getElementById('email-' + emailNum).classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
