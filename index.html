@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twiz Project Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 0.9rem;
+    }
+
+    .last-updated {
+      color: #6e7681;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: #21262d;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-header .icon {
+      font-size: 1.2rem;
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    .card-header .count {
+      margin-left: auto;
+      background: #30363d;
+      color: #8b949e;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 12px 0;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px 20px;
+      gap: 12px;
+      transition: background 0.2s;
+    }
+
+    .task-item:hover {
+      background: #1c2128;
+    }
+
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #30363d;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .checkbox.checked {
+      background: #238636;
+      border-color: #238636;
+      position: relative;
+    }
+
+    .checkbox.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .task-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-title {
+      color: #c9d1d9;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .task-item.completed .task-title {
+      color: #6e7681;
+      text-decoration: line-through;
+    }
+
+    .task-meta {
+      font-size: 0.8rem;
+      color: #8b949e;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .task-meta a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+
+    .task-meta a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status.draft {
+      background: #3d3d00;
+      color: #d4a72c;
+    }
+
+    .status.review {
+      background: #2d333b;
+      color: #a371f7;
+    }
+
+    .status.complete {
+      background: #1b4721;
+      color: #3fb950;
+    }
+
+    .status.pending {
+      background: #2d333b;
+      color: #8b949e;
+    }
+
+    .divider {
+      color: #30363d;
+      margin: 0 4px;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #6e7681;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #21262d;
+      color: #6e7681;
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🧋 Twiz Project Dashboard</h1>
+      <p class="subtitle">Beehiiv Email Nurture Sequence</p>
+      <p class="last-updated">Last updated: February 20, 2026</p>
+    </header>
+
+    <div class="dashboard">
+
+      <!-- Emails Section -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">📧</span>
+          <h2>Email Sequence</h2>
+          <span class="count">1 / 20</span>
+        </div>
+        <ul class="task-list">
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Email 1: Ebook Delivery</div>
+              <div class="task-meta">
+                <span class="status complete">Complete</span>
+                <span class="divider">•</span>
+                <a href="https://drive.google.com/file/d/1Zlq0F-HAQ5MSaXl_E43E_iaPkQ9IXx3C/view" target="_blank">Preview</a>
+                <span class="divider">•</span>
+                Day 0
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Email 2: Quick Win</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                Day 2
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Email 3: AI Shift</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                Day 4
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Email 4: Soft CTA</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                Day 7
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Email 5: Case Study #1</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                Day 10
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Resources Section -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">📚</span>
+          <h2>Resources</h2>
+          <span class="count">4</span>
+        </div>
+        <ul class="task-list">
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">AI Ebook (Lead Magnet)</div>
+              <div class="task-meta">
+                <span class="status complete">Ready</span>
+                <span class="divider">•</span>
+                <a href="#" target="_blank">PDF</a>
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Case Studies Page</div>
+              <div class="task-meta">
+                <span class="status complete">Ready</span>
+                <span class="divider">•</span>
+                <a href="https://twiz.io/case-studies" target="_blank">Link</a>
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Video Testimonials</div>
+              <div class="task-meta">
+                <span class="status complete">Ready</span>
+                <span class="divider">•</span>
+                <a href="https://www.youtube.com/playlist?list=PLgvafFxE7oxIIglQ5Y8zp2RPP_lgIji_m" target="_blank">YouTube</a>
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Calendly Booking</div>
+              <div class="task-meta">
+                <span class="status complete">Ready</span>
+                <span class="divider">•</span>
+                <a href="https://calendly.com/twiz/report" target="_blank">Link</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Section -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">✍️</span>
+          <h2>Content</h2>
+          <span class="count">0 / 3</span>
+        </div>
+        <ul class="task-list">
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Ebook Summary Doc</div>
+              <div class="task-meta">
+                <span class="status draft">Draft</span>
+                <span class="divider">•</span>
+                Internal reference
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Mic to Money Summary</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                For branch email
+              </div>
+            </div>
+          </li>
+          <li class="task-item">
+            <div class="checkbox"></div>
+            <div class="task-content">
+              <div class="task-title">Case Study Highlights</div>
+              <div class="task-meta">
+                <span class="status pending">Pending</span>
+                <span class="divider">•</span>
+                Email snippets
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Setup Section -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">⚙️</span>
+          <h2>Setup</h2>
+          <span class="count">4 / 4</span>
+        </div>
+        <ul class="task-list">
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Google Drive API</div>
+              <div class="task-meta">
+                <span class="status complete">Complete</span>
+                <span class="divider">•</span>
+                ftsboba@gmail.com
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">GitHub Repo</div>
+              <div class="task-meta">
+                <span class="status complete">Complete</span>
+                <span class="divider">•</span>
+                <a href="https://github.com/ChadFTS/twiz-dashboard" target="_blank">Repo</a>
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Vercel Deploy</div>
+              <div class="task-meta">
+                <span class="status complete">Complete</span>
+                <span class="divider">•</span>
+                <a href="https://twiz-dashboard.vercel.app" target="_blank">Live</a>
+              </div>
+            </div>
+          </li>
+          <li class="task-item completed">
+            <div class="checkbox checked"></div>
+            <div class="task-content">
+              <div class="task-title">Beehiiv Workflow</div>
+              <div class="task-meta">
+                <span class="status complete">Complete</span>
+                <span class="divider">•</span>
+                HTML → Copy extraction
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <footer>
+      <p>Built by 🧋 Boba • <a href="https://twiz.io" target="_blank">twiz.io</a></p>
+    </footer>
+  </div>
+
+</body>
+</html>
